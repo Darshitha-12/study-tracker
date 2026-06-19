@@ -1472,12 +1472,12 @@ function initFirebaseRefs(id){
 
 function startSessionListener(){
   if(!sessionsRef)return;
-  sessionsRef.once('value',snap=>{
+    sessionsRef.once('value',snap=>{
     var firebaseData=snap.val();
     try{
       ['st_sessions_v3','st_sessions_v2','st_sessions'].forEach(key=>{
         var ls=JSON.parse(localStorage.getItem(key)||'[]');
-        if(ls.length&&!firebaseData){var obj={};ls.forEach(s=>{obj['s'+s.id]=s;});sessionsRef.set(obj);localStorage.removeItem(key);}
+        if(ls.length&&!firebaseData){var obj={};ls.forEach(s=>{obj['s'+s.id]=s;});sessionsRef.set(obj).catch(()=>{});localStorage.removeItem(key);}
       });
     }catch(e){}
     _sessionsListener=function(snap2){
@@ -1487,7 +1487,7 @@ function startSessionListener(){
       render();
     };
     sessionsRef.on('value',_sessionsListener);
-  });
+  }).catch(()=>{});
 }
 
 // In-memory sessions cache
@@ -1543,7 +1543,7 @@ function loginWithName(name,callback){
     if(liveData)localStorage.setItem('st_live_session',JSON.stringify(liveData));
     setupPresence();
     if(callback)callback(liveData);
-  });
+  }).catch(()=>{});
 }
 
 // Init if already logged in
@@ -1613,27 +1613,27 @@ function setupPresence(){
   db.ref('.info/connected').on('value',snap=>{
     if(!snap.val()){return;}
     // When disconnected — Firebase auto-sets offline
-    presenceRef.onDisconnect().set({online:false,lastSeen:Date.now()});
+    presenceRef.onDisconnect().set({online:false,lastSeen:Date.now()}).catch(()=>{});
     // Mark online now
-    presenceRef.set({online:true,lastSeen:Date.now()});
+    presenceRef.set({online:true,lastSeen:Date.now()}).catch(()=>{});
   });
 }
 // Also update lastSeen every 30s while tab is open
-setInterval(()=>{if(presenceRef&&MY_ID)presenceRef.update({lastSeen:Date.now()});},30000);
+setInterval(()=>{if(presenceRef&&MY_ID)presenceRef.update({lastSeen:Date.now()}).catch(()=>{});},30000);
 // Mark offline when tab/window is hidden
 document.addEventListener('visibilitychange',()=>{
   if(!presenceRef)return;
   if(document.hidden){
-    presenceRef.set({online:false,lastSeen:Date.now()});
+    presenceRef.set({online:false,lastSeen:Date.now()}).catch(()=>{});
   } else {
-    presenceRef.set({online:true,lastSeen:Date.now()});
+    presenceRef.set({online:true,lastSeen:Date.now()}).catch(()=>{});
     // Also restart timer if was running
     if(running){clearInterval(timerInt);timerInt=setInterval(tickTimer,500);}
   }
 });
 // Mark offline on page unload
 window.addEventListener('beforeunload',()=>{
-  if(presenceRef)presenceRef.set({online:false,lastSeen:Date.now()});
+  if(presenceRef)presenceRef.set({online:false,lastSeen:Date.now()}).catch(()=>{});
 });
 
 function saveLiveState(isRunning){
@@ -2074,7 +2074,7 @@ db.ref('users').once('value',snap=>{
       db.ref('users/'+uid).remove().catch(()=>{});
     }
   });
-});
+}).catch(()=>{});
 
 // ── NAME MODAL — only show if no name saved ──
 if(!MY_NAME){
@@ -2361,7 +2361,7 @@ window.addEventListener('appinstalled',()=>{installBar.style.display='none';});
   function flashAlert(){var tab=document.getElementById('edge-chat-tab');if(tab){tab.classList.remove('flash');void tab.offsetWidth;tab.classList.add('flash');setTimeout(function(){tab.classList.remove('flash');},700);}var fl=document.getElementById('msg-flash');if(fl){fl.classList.remove('flash');void fl.offsetWidth;fl.classList.add('flash');setTimeout(function(){fl.classList.remove('flash');},700);}}
   window.ecpToggle=function(){ecpOpen=!ecpOpen;var panel=document.getElementById('edge-chat-panel');if(!panel)return;if(ecpOpen){panel.classList.add('open');ecpUnread=0;var badge=document.getElementById('edge-chat-badge');if(badge){badge.classList.remove('show');badge.textContent='';}setTimeout(function(){var f=document.getElementById('ecp-feed');if(f)f.scrollTop=f.scrollHeight;},60);}else{panel.classList.remove('open');}};
   function ecpAppend(msg){var feed=document.getElementById('ecp-feed');if(!feed)return;var name=msg.name||'?';var myName=(typeof MY_NAME!=='undefined'&&MY_NAME)||localStorage.getItem('st_username')||'';var isOwn=(myName&&name===myName);var c=isOwn?'#5DCAA5':col(name);var hex=c.replace('#','');var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);var ts=msg.ts?fmtChatTime(msg.ts):'';var row=document.createElement('div');row.className='ecp-msg'+(isOwn?' ecp-own':'');row.innerHTML='<div class="ecp-av" style="background:rgba('+r+','+g+','+b+',.18);color:'+c+'">'+name[0].toUpperCase()+'</div><div class="ecp-bubble"><span class="ecp-name" style="color:'+c+'">'+esc(name)+'</span><span class="ecp-text">'+esc(msg.msg)+'</span><span class="ecp-ts">'+ts+'</span></div>';feed.appendChild(row);if(feed.querySelectorAll('.ecp-msg').length>80)feed.firstChild.remove();feed.scrollTop=feed.scrollHeight;if(!isOwn&&ecpDone&&msgCount>0){if(!ecpOpen){ecpUnread++;var badge=document.getElementById('edge-chat-badge');if(badge){badge.textContent=ecpUnread>9?'9+':ecpUnread;badge.classList.add('show');}playAlert();flashAlert();}}msgCount++;}
-  fcRef.limitToLast(40).once('value',function(snap){var items=[];snap.forEach(function(c){items.push(Object.assign({},c.val(),{_key:c.key}));});items.sort(function(a,b){return a.ts-b.ts;});items.forEach(ecpAppend);if(items.length)ecpLast=items[items.length-1].ts;ecpDone=true;ecpUnread=0;var badge=document.getElementById('edge-chat-badge');if(badge){badge.classList.remove('show');badge.textContent='';}});
+  fcRef.limitToLast(40).once('value',function(snap){var items=[];snap.forEach(function(c){items.push(Object.assign({},c.val(),{_key:c.key}));});items.sort(function(a,b){return a.ts-b.ts;});items.forEach(ecpAppend);if(items.length)ecpLast=items[items.length-1].ts;ecpDone=true;ecpUnread=0;var badge=document.getElementById('edge-chat-badge');if(badge){badge.classList.remove('show');badge.textContent='';}}).catch(()=>{});
   fcRef.on('child_added',function(snap){if(!ecpDone)return;var msg=Object.assign({},snap.val(),{_key:snap.key});if(msg.ts<=ecpLast)return;ecpLast=msg.ts;ecpAppend(msg);});
   function fmtChatTime(ts){
     var d=new Date(ts),hh=d.getHours(),mm=d.getMinutes(),ap=hh>=12?'PM':'AM';
