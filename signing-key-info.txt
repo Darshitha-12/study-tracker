@@ -1,0 +1,10 @@
+Keep this file and signing.keystore in a safe place. You'll need these files if you want to upload future versions of your PWA to the Google Play Store.
+
+Key store file: signing.keystore
+Key store password: XEIwBvlNV55i
+Key alias: my-android-key
+Key password: XEIwBvlNV55i
+Signer's full name: Poson App
+Signer's organization: Poson
+Signer's organizational unit: Development
+Signer's country code: LK

@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.poson.study.tracker",
+        "sha256_cert_fingerprints": ["50:05:62:98:9E:2C:AE:A5:C1:44:1D:8E:F0:04:27:25:66:3D:03:CC:29:88:E5:95:91:F1:9E:C8:5B:C4:8C:BC"]
+      }
+    }]
