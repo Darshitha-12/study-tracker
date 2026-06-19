@@ -177,7 +177,22 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
   transition:width 1s linear;
 }
 
+}
+
+/* ══ LIVE SCHEDULE BAR ══ */
+@keyframes liveBlink {
+  0%,100%{opacity:1}
+  50%{opacity:.3}
+}
+@keyframes liveBorderPulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(200,50,50,.2);border-color:rgba(200,50,50,.5)}
+  50%{box-shadow:0 0 20px rgba(200,50,50,.2);border-color:rgba(200,50,50,.8)}
+}
+.live-bar-endtxt{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em}
+.live-bar-count{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#e86060;font-variant-numeric:tabular-nums}
+
 /* ══ POSON POYA SPLASH SCREEN ══ */
+/* ══ POSON POYA SPLASH — REALISTIC SCENE ══ */
 /* ══ POSON POYA SPLASH — REALISTIC SCENE ══ */
 .ps-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .ps-sky{position:absolute;inset:0;background:linear-gradient(180deg,#0a0824 0%,#1a0e3a 16%,#4a1e50 30%,#b05848 44%,#e09038 50%,#d07830 54%,#3a7020 64%,#1a4a10 80%,#0a1e04 100%)}
@@ -671,6 +686,21 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     <div id="upcoming-alert-list"></div>
   </div>
 
+  <!-- LIVE SCHEDULE BAR -->
+  <div id="live-schedule-bar" style="display:none;margin-bottom:.75rem;padding:.75rem 1rem;border-radius:12px;background:rgba(200,50,50,.08);border:2px solid rgba(200,50,50,.5);animation:liveBorderPulse 1s ease-in-out infinite">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="live-badge" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;background:#c83232;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;animation:liveBlink 1s step-end infinite">● LIVE</span>
+        <span id="live-schedule-subject" style="font-size:13px;font-weight:700;color:#e0f5ea"></span>
+        <span id="live-schedule-user" style="font-size:11px;color:rgba(255,255,255,.5)"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="live-bar-endtxt">Ends in</span>
+        <span id="live-countdown" class="live-bar-count">0m 00s</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ALL USERS LIVE -->
   <div class="section-title">👥 Who's studying now</div>
   <div id="all-users-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:.75rem">
@@ -1025,6 +1055,7 @@ db.ref('users').on('value',snap=>{
   renderAllUsers();
   render();
   renderPublicSchedules();
+  renderLiveBar();
   startLiveStatsTicker();
   checkGeminiAccess();
 });
@@ -1670,7 +1701,10 @@ function renderPublicSchedules(){
     var badgeTxt='';
     if(status==='active'){
       badgeCls+=' spib-active';
-      badgeTxt='<span class="spi-dot-live"></span> In Progress';
+      var remSecs=Math.floor((endDt-now)/1000);
+      var remM=Math.floor(remSecs/60),remS=remSecs%60;
+      if(remSecs<0) remSecs=0;
+      badgeTxt='<span class="spi-dot-live"></span> '+remM+'m '+String(remS).padStart(2,'0')+'s left';
     } else if(isSoon){
       badgeCls+=' spib-soon';
       badgeTxt='<span class="spi-soon-icon">&#x231B;</span> Starts in '+cdTxt;
@@ -1714,7 +1748,39 @@ function renderPublicSchedules(){
   }).join('');
 }
 
+function renderLiveBar(){
+  var bar=document.getElementById('live-schedule-bar');
+  var subjEl=document.getElementById('live-schedule-subject');
+  var userEl=document.getElementById('live-schedule-user');
+  var cdEl=document.getElementById('live-countdown');
+  if(!bar)return;
+  var now=new Date(),today=todayKey();
+  var active=null;
+  Object.entries(_allUsers).forEach(function(pair){
+    var u=pair[1];
+    (u.schedules||[]).forEach(function(sc){
+      if(sc.date!==today)return;
+      var parts=sc.startTime.split(':');
+      var start=new Date();start.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+      var end=new Date(start.getTime()+sc.duration*1000);
+      if(now>=start&&now<end){active={sc:sc,name:(u.profile&&u.profile.name)||'Unknown',end:end};}
+    });
+  });
+  if(active){
+    var rem=Math.floor((active.end-now)/1000);
+    if(rem<0)rem=0;
+    var m=Math.floor(rem/60),s=rem%60;
+    bar.style.display='';
+    subjEl.textContent=escHtml(active.sc.subject||(active.sc.isBreak?'Break':''));
+    userEl.textContent='by '+escHtml(active.name);
+    cdEl.textContent=m+'m '+String(s).padStart(2,'0')+'s';
+  } else {
+    bar.style.display='none';
+  }
+}
+
 setInterval(renderPublicSchedules,1000);
+setInterval(renderLiveBar,500);
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escAttr(s){return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;');}
