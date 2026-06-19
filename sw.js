@@ -46,3 +46,9 @@ function cachePut(req, res) {
   caches.open(CACHE).then(function(cache) { cache.put(req, copy); });
   return res;
 }
+
+// ── Notification click opens app ──
+self.addEventListener('notificationclick', function(e) {
+  e.notification.close();
+  e.waitUntil(clients.openWindow('/study-tracker/'));
+});
