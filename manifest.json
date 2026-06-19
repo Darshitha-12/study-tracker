@@ -1,0 +1,20 @@
+{
+  "name": "Poson Study Tracker",
+  "short_name": "Study Tracker",
+  "description": "A/L Study Timer with Poson theme — track study sessions, live chat, daily targets",
+  "start_url": "/study-tracker/",
+  "scope": "/study-tracker/",
+  "display": "standalone",
+  "background_color": "#080603",
+  "theme_color": "#c9a84c",
+  "orientation": "portrait",
+  "categories": ["education", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "screenshots": []
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a2a10"/>
+      <stop offset="50%" stop-color="#c9882c"/>
+      <stop offset="100%" stop-color="#2a5a10"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff8d0"/>
+      <stop offset="60%" stop-color="#f0c040"/>
+      <stop offset="100%" stop-color="#d08028"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  <circle cx="256" cy="220" r="100" fill="url(#sun)" opacity="0.9"/>
+  <circle cx="256" cy="220" r="80" fill="none" stroke="#fff" stroke-width="6" opacity="0.4"/>
+  <line x1="256" y1="220" x2="256" y2="160" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <line x1="256" y1="220" x2="286" y2="240" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="256" cy="220" r="12" fill="#fff"/>
+  <path d="M160 380 Q200 340 256 360 Q312 340 352 380" fill="none" stroke="#3a8a20" stroke-width="8" stroke-linecap="round"/>
+  <path d="M140 400 Q200 370 256 385 Q312 370 372 400" fill="none" stroke="#2a6a15" stroke-width="6" stroke-linecap="round"/>
+  <text x="256" y="460" text-anchor="middle" font-family="sans-serif" font-size="32" font-weight="bold" fill="#f0d080" opacity="0.8">A/L</text>
+</svg>

@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Tracker — A/L 2026</title>
-<meta name="theme-color" content="#1D9E75">
+<meta name="theme-color" content="#c9a84c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-title" content="StudyTracker">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.svg">
@@ -2832,6 +2833,8 @@ window.addEventListener('appinstalled',()=>{installBar.style.display='none';});
   }
   requestAnimationFrame(frame);
 })();
+// ── Service Worker Registration ──
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(e){console.warn('SW:',e);});
 </script>
 </body>
 </html>

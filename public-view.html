@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Darshitha's Study — Live</title>
-<meta name="theme-color" content="#1D9E75">
+<meta name="theme-color" content="#c9a84c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
@@ -2588,6 +2588,8 @@ window.addEventListener('beforeunload', function(){
   }
   requestAnimationFrame(frame);
 })();
+// ── Service Worker Registration ──
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(e){console.warn('SW:',e);});
 </script>
 </body>
 </html>
