@@ -355,6 +355,28 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
 .dt-input:focus{border-color:rgba(29,158,117,.5)}
 .dt-add-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:9px;padding:8px 14px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .dt-add-btn:hover{background:linear-gradient(135deg,#0d5228,#25b882)}
+.dt-slide-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 11px;color:rgba(255,255,255,.5);cursor:pointer;font-size:14px;transition:all .15s;line-height:1}
+.dt-slide-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.8)}
+/* ══ TASKS SLIDE PANEL ══ */
+.dt-slide-overlay{position:fixed;inset:0;z-index:8994;background:rgba(0,0,0,.35);display:none;backdrop-filter:blur(2px)}
+.dt-slide-overlay.open{display:block}
+.dt-slide-panel{position:fixed;top:0;right:-320px;bottom:0;width:300px;z-index:8995;background:linear-gradient(180deg,rgba(10,6,4,.98),rgba(6,3,1,.98));border-left:1px solid rgba(255,255,255,.06);box-shadow:-8px 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column;transition:right .3s cubic-bezier(.16,1,.3,1)}
+.dt-slide-panel.open{right:0}
+.dt-slide-header{display:flex;align-items:center;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.dt-slide-title{font-size:13px;font-weight:700;color:#f0eae0;flex:1}
+.dt-slide-close{background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.dt-slide-close:hover{color:#fff;background:rgba(255,255,255,.08)}
+.dt-slide-body{flex:1;overflow-y:auto;padding:12px 14px}
+.dt-slide-group{margin-bottom:16px}
+.dt-slide-user{font-size:11px;font-weight:700;color:#c9a84c;padding:4px 0 6px;border-bottom:1px solid rgba(201,168,76,.12);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.dt-slide-user-av{width:16px;height:16px;border-radius:50%;background:rgba(201,168,76,.18);color:#c9a84c;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dt-slide-task{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 8px;border-radius:8px;margin-bottom:4px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.08);font-size:12px;color:rgba(255,255,255,.7);transition:background .15s}
+.dt-slide-task:hover{background:rgba(255,255,255,.06)}
+.dt-slide-task.done{opacity:.45;color:rgba(255,255,255,.3)}
+.dt-slide-task .dt-slide-task-text{flex:1;line-height:1.3}
+.dt-slide-task .dt-slide-task-text.done{text-decoration:line-through}
+.dt-slide-task-subj{font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;border:1px solid;flex-shrink:0}
+.dt-slide-empty{padding:2rem 0;text-align:center;font-size:12px;color:rgba(255,255,255,.2)}
 .dt-list{display:flex;flex-direction:column;gap:6px}
 .dt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:all .25s;position:relative;overflow:hidden;animation:dtSlideIn .2s ease}
 .dt-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dt-bar,rgba(29,158,117,.3));border-radius:3px 0 0 3px;transition:background .25s}
@@ -924,10 +946,13 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min
     </div>
     <div class="dt-progress-bar"><div class="dt-progress-fill" id="dt-progress-fill" style="width:0%"></div></div>
     <div class="dt-add-row" id="dt-add-row">
+      <div style="display:flex;gap:6px">
       <button class="dt-add-btn" onclick="dtOpenModal()" style="flex:1;justify-content:center;padding:9px 14px">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add task
       </button>
+      <button class="dt-slide-btn" onclick="dtOpenSlide()" title="View all tasks">👥</button>
+      </div>
     </div>
     <div class="dt-list" id="dt-list">
       <div class="dt-empty"><span class="dt-empty-icon">📋</span>No tasks yet — add one above!</div>
@@ -2380,6 +2405,58 @@ document.addEventListener('keydown',function(e){
   }
 });
 
+// ══ TASKS SLIDE PANEL ══
+window.dtOpenSlide=function(){
+  document.getElementById('dt-slide-overlay').classList.add('open');
+  document.getElementById('dt-slide-panel').classList.add('open');
+  renderDtSlide();
+};
+window.dtCloseSlide=function(){
+  document.getElementById('dt-slide-overlay').classList.remove('open');
+  document.getElementById('dt-slide-panel').classList.remove('open');
+};
+function renderDtSlide(){
+  var body=document.getElementById('dt-slide-body');
+  if(!body)return;
+  var dates=getDtViewDates();
+  var allTasks=[];
+  dates.forEach(function(dk){
+    var dayTasks=_dtData[dk]||{};
+    Object.entries(dayTasks).forEach(function(pair){
+      allTasks.push(Object.assign({},pair[1],{_id:pair[0],_date:dk}));
+    });
+  });
+  allTasks.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  if(!allTasks.length){
+    body.innerHTML='<div class="dt-slide-empty">No tasks yet.</div>';
+    return;
+  }
+  var groups={};
+  allTasks.forEach(function(t){
+    var u=t.createdBy||'Anonymous';
+    if(!groups[u])groups[u]=[];
+    groups[u].push(t);
+  });
+  var html='';
+  Object.keys(groups).forEach(function(u){
+    html+='<div class="dt-slide-group">';
+    html+='<div class="dt-slide-user"><span class="dt-slide-user-av">'+escHtml(u[0].toUpperCase())+'</span>'+escHtml(u)+'</div>';
+    groups[u].forEach(function(t){
+      var isDone=!!t.done;
+      var subjColor=t.subject?(SUBJ_COLORS[t.subject]||'#1D9E75'):'';
+      var badgeHtml=t.subject
+        ?'<span class="dt-slide-task-subj" style="color:'+subjColor+';border-color:'+subjColor+'55">'+escHtml(t.subject)+'</span>'
+        :'';
+      html+='<div class="dt-slide-task'+(isDone?' done':'')+'">'
+        +badgeHtml
+        +'<span class="dt-slide-task-text'+(isDone?' done':'')+'">'+escHtml(t.text)+'</span>'
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  body.innerHTML=html;
+}
+
 (function(){
   // ── Audio once-per-day ──
   var today=new Date().toDateString(),last=localStorage.getItem('sp_audio_date');
@@ -3116,5 +3193,16 @@ document.addEventListener('keydown',function(e){
     <div class="dt-modal-hint">Add multiple tasks — type and click Add each time</div>
   </div>
 </div>
+
+<!-- ══ TASKS SLIDE PANEL ══ -->
+<div class="dt-slide-overlay" id="dt-slide-overlay" onclick="if(event.target===this)dtCloseSlide()"></div>
+<div class="dt-slide-panel" id="dt-slide-panel">
+  <div class="dt-slide-header">
+    <span class="dt-slide-title">📋 Daily Tasks</span>
+    <button class="dt-slide-close" onclick="dtCloseSlide()">✕</button>
+  </div>
+  <div class="dt-slide-body" id="dt-slide-body"></div>
+</div>
+
 </body>
 </html>
