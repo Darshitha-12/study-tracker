@@ -339,6 +339,63 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
 @keyframes screenFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
 #msg-flash.flash{animation:screenFlash .6s ease;background:rgba(201,168,76,.06);}
 
+/* ══ DAILY TASKS ══ */
+.dt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem}
+.dt-title-row{display:flex;align-items:center;gap:8px}
+.dt-date-label{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.06em;text-transform:uppercase}
+.dt-progress{font-size:10px;color:rgba(29,158,117,.7);font-weight:600}
+.dt-add-row{display:flex;flex-direction:column;gap:7px;margin-bottom:.75rem}
+.dt-subject-pills{display:flex;gap:5px;flex-wrap:wrap}
+.dt-spill{font-size:10.5px;font-weight:700;padding:4px 11px;border-radius:99px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);cursor:pointer;transition:all .18s;letter-spacing:.02em;white-space:nowrap}
+.dt-spill:hover{border-color:rgba(255,255,255,.22);color:rgba(255,255,255,.7)}
+.dt-spill.active[data-subj=""]{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff}
+.dt-spill.active:not([data-subj=""]){background:color-mix(in srgb,var(--sc,#1D9E75) 18%,transparent);border-color:color-mix(in srgb,var(--sc,#1D9E75) 55%,transparent);color:var(--sc,#1D9E75);box-shadow:0 0 0 3px color-mix(in srgb,var(--sc,#1D9E75) 10%,transparent)}
+.dt-subj-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;border:1px solid;white-space:nowrap;flex-shrink:0}
+.dt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 12px;font-size:13px;color:#f0f0f0;font-family:inherit;outline:none;transition:border-color .2s}
+.dt-input:focus{border-color:rgba(29,158,117,.5)}
+.dt-add-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:9px;padding:8px 14px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.dt-add-btn:hover{background:linear-gradient(135deg,#0d5228,#25b882)}
+.dt-list{display:flex;flex-direction:column;gap:6px}
+.dt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:all .25s;position:relative;overflow:hidden;animation:dtSlideIn .2s ease}
+.dt-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dt-bar,rgba(29,158,117,.3));border-radius:3px 0 0 3px;transition:background .25s}
+.dt-item.dt-done{opacity:.55}
+.dt-item.dt-done::before{background:rgba(255,255,255,.15)}
+.dt-check{width:20px;height:20px;border-radius:50%;border:2px solid rgba(29,158,117,.5);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;position:relative}
+.dt-check:hover{border-color:#1D9E75;background:rgba(29,158,117,.1)}
+.dt-item.dt-done .dt-check{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-color:#1D9E75}
+.dt-check-icon{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;display:none}
+.dt-item.dt-done .dt-check-icon{display:block}
+.dt-text{flex:1;font-size:13px;color:#e0f0ea;line-height:1.4;transition:color .2s}
+.dt-creator{font-size:9px;color:rgba(255,255,255,.25);margin-left:auto;flex-shrink:0;padding-left:6px}
+.dt-item.dt-done .dt-text{text-decoration:line-through;color:rgba(255,255,255,.35)}
+.dt-del{background:none;border:none;color:rgba(255,75,74,.4);font-size:16px;cursor:pointer;padding:2px 5px;border-radius:5px;line-height:1;transition:color .15s,background .15s;flex-shrink:0}
+.dt-del:hover{color:#E24B4A;background:rgba(226,75,74,.1)}
+.dt-empty{text-align:center;padding:1.5rem 0;font-size:12px;color:rgba(255,255,255,.2)}
+.dt-empty-icon{font-size:28px;margin-bottom:.4rem;display:block}
+.dt-progress-bar{height:3px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin-bottom:.75rem}
+.dt-progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#0F6E56,#1D9E75,#5DCAA5);transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+.dt-view-tabs{display:flex;gap:4px;margin-bottom:.6rem}
+.dt-view-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:4px 10px;font-size:10px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s}
+.dt-view-tab.active{background:rgba(29,158,117,.15);border-color:rgba(29,158,117,.35);color:#5DCAA5}
+@keyframes dtSlideIn{from{transform:translateY(6px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ══ ADD TASK MODAL ══ */
+.dt-modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px}
+.dt-modal-overlay.open{display:flex}
+.dt-modal{background:linear-gradient(160deg,rgba(14,10,8,.96),rgba(10,6,4,.96));border-radius:16px;padding:18px;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--_dt-modal-color,#1D9E75);box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);animation:dtModalIn .2s ease}
+@keyframes dtModalIn{from{transform:translateY(20px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.dt-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dt-modal-title{font-size:14px;font-weight:700;color:#f0eae0}
+.dt-modal-close{background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.dt-modal-close:hover{color:#fff;background:rgba(255,255,255,.08)}
+.dt-modal-subject-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.dt-modal-subject-pills .dt-spill{font-size:9.5px;padding:3px 9px}
+.dt-modal-input-row{display:flex;gap:6px}
+.dt-modal-input-row .dt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 12px;font-size:13px;color:#f0f0f0;font-family:inherit;outline:none;transition:border-color .2s}
+.dt-modal-input-row .dt-input:focus{border-color:var(--_dt-modal-color,#1D9E75)}
+.dt-modal-input-row .dt-add-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:9px;padding:8px 14px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.dt-modal-input-row .dt-add-btn:hover{background:linear-gradient(135deg,#0d5228,#25b882)}
+.dt-modal-hint{font-size:10px;color:rgba(255,255,255,.2);margin-top:8px;text-align:center}
+
 #splash-screen{position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 42%,#0d1a10 0%,#030806 75%);transition:opacity 1s ease,transform 1s ease;}
 #splash-screen.sp-out{opacity:0;transform:scale(1.05);pointer-events:none}
 .sp-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -504,6 +561,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min
 .session-dur{font-size:12px;color:var(--muted);white-space:nowrap;font-family:'Syne',sans-serif}
 .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;color:#fff}
 .empty{font-size:13px;color:var(--hint);padding:1rem 0;text-align:center}
+.section-title{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--hint);font-size:16px;padding:0 3px;line-height:1;transition:color .1s;flex-shrink:0}
 .del-btn:hover{color:var(--red)}
 /* FILTER CHIPS */
@@ -847,6 +905,34 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min
       <button class="sched-date-chip" onclick="setSchedDateFilter('all',this)">All</button>
     </div>
     <div id="sched-list"><p class="empty">No schedules yet — add one above.</p></div>
+  </div>
+
+  <!-- DAILY TASKS -->
+  <div class="section-title" style="margin-top:1rem">✅ Daily Tasks</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;margin-bottom:1rem">
+  <div id="daily-tasks-section">
+    <div class="dt-header">
+      <div class="dt-title-row">
+        <div class="dt-date-label" id="dt-date-label">Today</div>
+        <div class="dt-progress" id="dt-progress-label">0 / 0 done</div>
+      </div>
+      <div class="dt-view-tabs">
+        <div class="dt-view-tab active" onclick="setDtView('today',this)">Today</div>
+        <div class="dt-view-tab" onclick="setDtView('yesterday',this)">Yesterday</div>
+        <div class="dt-view-tab" onclick="setDtView('week',this)">This week</div>
+      </div>
+    </div>
+    <div class="dt-progress-bar"><div class="dt-progress-fill" id="dt-progress-fill" style="width:0%"></div></div>
+    <div class="dt-add-row" id="dt-add-row">
+      <button class="dt-add-btn" onclick="dtOpenModal()" style="flex:1;justify-content:center;padding:9px 14px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add task
+      </button>
+    </div>
+    <div class="dt-list" id="dt-list">
+      <div class="dt-empty"><span class="dt-empty-icon">📋</span>No tasks yet — add one above!</div>
+    </div>
+  </div>
   </div>
 
   <!-- SESSION LOG -->
@@ -2145,6 +2231,155 @@ window.addEventListener('appinstalled',()=>{installBar.style.display='none';});
 <div id="heart-rain-canvas"></div>
 
 <script>
+// ══ DAILY TASKS ══
+var _dtView='today';
+var _dtRef=db.ref('dailyTasks');
+var _dtData={};
+var _dtSelSubj='';
+
+window.dtSelectSubj=function(el,subj){
+  _dtSelSubj=subj;
+  document.querySelectorAll('.dt-spill').forEach(function(p){p.classList.remove('active');});
+  if(el)el.classList.add('active');
+  var inp=document.getElementById('dt-new-task');
+  if(inp){
+    if(subj)inp.placeholder='Add a '+subj+' task...';else inp.placeholder='Add a task...';
+    inp.focus();
+  }
+  var modal=document.getElementById('dt-modal-card');
+  if(modal){
+    var cMap={Biology:'#1D9E75',Chemistry:'#378ADD',Physics:'#7F77DD','Combined Maths':'#D85A30',ICT:'#EF9F27',Other:'#5DCAA5'};
+    modal.style.setProperty('--_dt-modal-color',cMap[subj]||'#1D9E75');
+  }
+};
+function dtDateKey(offset){
+  var d=new Date();
+  d.setDate(d.getDate()+(offset||0));
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dtFriendlyDate(key){
+  var today=dtDateKey(0),yest=dtDateKey(-1);
+  if(key===today)return 'Today — '+new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  if(key===yest)return 'Yesterday — '+new Date(key).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  return new Date(key+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+_dtRef.on('value',function(snap){
+  _dtData=snap.val()||{};
+  renderDailyTasks();
+});
+window.setDtView=function(v,el){
+  _dtView=v;
+  document.querySelectorAll('.dt-view-tab').forEach(function(t){t.classList.remove('active');});
+  if(el)el.classList.add('active');
+  var addRow=document.getElementById('dt-add-row');
+  if(addRow)addRow.style.display=(v==='today'||v==='yesterday')?'flex':'none';
+  renderDailyTasks();
+};
+function getDtViewDates(){
+  if(_dtView==='today') return [dtDateKey(0)];
+  if(_dtView==='yesterday') return [dtDateKey(-1)];
+  var dates=[];
+  for(var i=6;i>=0;i--) dates.push(dtDateKey(-i));
+  return dates;
+}
+function renderDailyTasks(){
+  var list=document.getElementById('dt-list');
+  var progressLabel=document.getElementById('dt-progress-label');
+  var progressFill=document.getElementById('dt-progress-fill');
+  var dateLabel=document.getElementById('dt-date-label');
+  if(!list)return;
+  var dates=getDtViewDates();
+  var allTasks=[];
+  dates.forEach(function(dk){
+    var dayTasks=_dtData[dk]||{};
+    Object.entries(dayTasks).forEach(function(pair){
+      allTasks.push(Object.assign({},pair[1],{_id:pair[0],_date:dk}));
+    });
+  });
+  allTasks.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  if(dateLabel){
+    if(_dtView==='today') dateLabel.textContent=dtFriendlyDate(dtDateKey(0));
+    else if(_dtView==='yesterday') dateLabel.textContent=dtFriendlyDate(dtDateKey(-1));
+    else dateLabel.textContent='Past 7 days';
+  }
+  var total=allTasks.length, done=allTasks.filter(function(t){return t.done;}).length;
+  if(progressLabel)progressLabel.textContent=done+' / '+total+' done';
+  var pct=total?Math.round(done/total*100):0;
+  if(progressFill)progressFill.style.width=pct+'%';
+  if(!allTasks.length){
+    list.innerHTML='<div class="dt-empty"><span class="dt-empty-icon">📋</span>'
+      +(_dtView==='today'?'No tasks yet — add one above!':'No tasks for this period.')+'</div>';
+    return;
+  }
+  var grouped={};
+  allTasks.forEach(function(t){
+    if(!grouped[t._date])grouped[t._date]=[];
+    grouped[t._date].push(t);
+  });
+  var html='';
+  Object.keys(grouped).sort().reverse().forEach(function(dk){
+    if(_dtView==='week'){
+      html+='<div style="font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.06em;text-transform:uppercase;padding:4px 0 6px;margin-top:4px">'+dtFriendlyDate(dk)+'</div>';
+    }
+    grouped[dk].forEach(function(t){
+      var isDone=!!t.done;
+      var subjColor=t.subject?(SUBJ_COLORS[t.subject]||'#1D9E75'):'';
+      var badgeHtml=t.subject
+        ?'<span class="dt-subj-badge" style="color:'+subjColor+';background:'+subjColor+'22;border-color:'+subjColor+'55">'+escHtml(t.subject)+'</span>'
+        :'';
+      var barStyle=t.subject?'style="--dt-bar:'+subjColor+'"':'';
+      var creator=t.createdBy?'<span class="dt-creator">'+escHtml(t.createdBy)+'</span>':'';
+      html+='<div class="dt-item'+(isDone?' dt-done':'')+'" id="dt-item-'+t._id+'" '+barStyle+'>'
+        +'<button class="dt-check" onclick="dtToggle(\''+t._date+'\',\''+t._id+'\')" title="'+(isDone?'Mark undone':'Mark done')+'">'
+        +'<svg class="dt-check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+        +'</button>'
+        +badgeHtml
+        +'<span class="dt-text">'+escHtml(t.text)+'</span>'
+        +creator;
+      if(_dtView==='today'||_dtView==='yesterday'){
+        html+='<button class="dt-del" onclick="dtDelete(\''+t._date+'\',\''+t._id+'\')" title="Delete">×</button>';
+      }
+      html+='</div>';
+    });
+  });
+  list.innerHTML=html;
+}
+window.dtAddTask=function(){
+  var inp=document.getElementById('dt-new-task');
+  var text=inp?inp.value.trim():'';
+  if(!text)return;
+  var dk=_dtView==='yesterday'?dtDateKey(-1):dtDateKey(0);
+  var name=(typeof MY_NAME!=='undefined'&&MY_NAME)||localStorage.getItem('st_username')||'User';
+  var payload={text:text,done:false,ts:Date.now(),createdBy:name};
+  if(_dtSelSubj)payload.subject=_dtSelSubj;
+  _dtRef.child(dk).push(payload);
+  if(inp){inp.value='';inp.focus();}
+};
+window.dtToggle=function(dk,tid){
+  var task=(_dtData[dk]&&_dtData[dk][tid]);
+  if(!task)return;
+  _dtRef.child(dk).child(tid).update({done:!task.done});
+};
+window.dtDelete=function(dk,tid){
+  _dtRef.child(dk).child(tid).remove();
+};
+window.dtOpenModal=function(){
+  document.getElementById('dt-modal').classList.add('open');
+  setTimeout(function(){
+    var inp=document.getElementById('dt-new-task');
+    if(inp){inp.value='';inp.focus();}
+  },100);
+};
+window.dtCloseModal=function(){
+  document.getElementById('dt-modal').classList.remove('open');
+};
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('dt-modal').classList.contains('open')){
+    var inp=document.getElementById('dt-new-task');
+    if(inp&&document.activeElement===inp){e.preventDefault();dtAddTask();}
+  }
+});
+
 (function(){
   // ── Audio once-per-day ──
   var today=new Date().toDateString(),last=localStorage.getItem('sp_audio_date');
@@ -2854,5 +3089,32 @@ window.addEventListener('appinstalled',()=>{installBar.style.display='none';});
   requestAnimationFrame(frame);
 })();
 </script>
+
+<!-- ══ ADD TASK MODAL ══ -->
+<div class="dt-modal-overlay" id="dt-modal" onclick="if(event.target===this)dtCloseModal()">
+  <div class="dt-modal" id="dt-modal-card" style="--_dt-modal-color:#1D9E75">
+    <div class="dt-modal-header">
+      <span class="dt-modal-title">Add task</span>
+      <button class="dt-modal-close" onclick="dtCloseModal()">✕</button>
+    </div>
+    <div class="dt-modal-subject-pills">
+      <div class="dt-spill active" data-subj="" onclick="dtSelectSubj(this,'')">All</div>
+      <div class="dt-spill" data-subj="Biology" onclick="dtSelectSubj(this,'Biology')" style="--sc:#1D9E75">Bio</div>
+      <div class="dt-spill" data-subj="Chemistry" onclick="dtSelectSubj(this,'Chemistry')" style="--sc:#378ADD">Chem</div>
+      <div class="dt-spill" data-subj="Physics" onclick="dtSelectSubj(this,'Physics')" style="--sc:#7F77DD">Phy</div>
+      <div class="dt-spill" data-subj="Combined Maths" onclick="dtSelectSubj(this,'Combined Maths')" style="--sc:#D85A30">Maths</div>
+      <div class="dt-spill" data-subj="ICT" onclick="dtSelectSubj(this,'ICT')" style="--sc:#EF9F27">ICT</div>
+      <div class="dt-spill" data-subj="Other" onclick="dtSelectSubj(this,'Other')" style="--sc:#5DCAA5">Other</div>
+    </div>
+    <div class="dt-modal-input-row">
+      <input class="dt-input" id="dt-new-task" placeholder="Type a task..." maxlength="120" autofocus>
+      <button class="dt-add-btn" onclick="dtAddTask()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+    <div class="dt-modal-hint">Add multiple tasks — type and click Add each time</div>
+  </div>
+</div>
 </body>
 </html>

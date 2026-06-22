@@ -324,6 +324,23 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
 .dt-view-tabs{display:flex;gap:4px;margin-bottom:.6rem;}
 .dt-view-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:4px 10px;font-size:10px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;}
 .dt-view-tab.active{background:rgba(29,158,117,.15);border-color:rgba(29,158,117,.35);color:#5DCAA5;}
+/* ══ ADD TASK MODAL ══ */
+.dt-modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px}
+.dt-modal-overlay.open{display:flex}
+.dt-modal{background:linear-gradient(160deg,rgba(14,10,8,.96),rgba(10,6,4,.96));border-radius:16px;padding:18px;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--_dt-modal-color,#1D9E75);box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);animation:dtModalIn .2s ease}
+@keyframes dtModalIn{from{transform:translateY(20px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.dt-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dt-modal-title{font-size:14px;font-weight:700;color:#f0eae0}
+.dt-modal-close{background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.dt-modal-close:hover{color:#fff;background:rgba(255,255,255,.08)}
+.dt-modal-subject-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.dt-modal-subject-pills .dt-spill{font-size:9.5px;padding:3px 9px}
+.dt-modal-input-row{display:flex;gap:6px}
+.dt-modal-input-row .dt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 12px;font-size:13px;color:#f0f0f0;font-family:inherit;outline:none;transition:border-color .2s}
+.dt-modal-input-row .dt-input:focus{border-color:var(--_dt-modal-color,#1D9E75)}
+.dt-modal-input-row .dt-add-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:9px;padding:8px 14px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.dt-modal-input-row .dt-add-btn:hover{background:linear-gradient(135deg,#0d5228,#25b882)}
+.dt-modal-hint{font-size:10px;color:rgba(255,255,255,.2);margin-top:8px;text-align:center}
 @keyframes dtSlideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .dt-item{animation:dtSlideIn .2s ease;}
 
@@ -785,22 +802,10 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     </div>
     <div class="dt-progress-bar"><div class="dt-progress-fill" id="dt-progress-fill" style="width:0%"></div></div>
     <div class="dt-add-row" id="dt-add-row">
-      <div class="dt-subject-pills" id="dt-subject-pills">
-        <div class="dt-spill active" data-subj="" onclick="dtSelectSubj(this,'')">All</div>
-        <div class="dt-spill" data-subj="Biology" onclick="dtSelectSubj(this,'Biology')" style="--sc:#1D9E75">Bio</div>
-        <div class="dt-spill" data-subj="Chemistry" onclick="dtSelectSubj(this,'Chemistry')" style="--sc:#378ADD">Chem</div>
-        <div class="dt-spill" data-subj="Physics" onclick="dtSelectSubj(this,'Physics')" style="--sc:#7F77DD">Phy</div>
-        <div class="dt-spill" data-subj="Combined Maths" onclick="dtSelectSubj(this,'Combined Maths')" style="--sc:#D85A30">Maths</div>
-        <div class="dt-spill" data-subj="ICT" onclick="dtSelectSubj(this,'ICT')" style="--sc:#EF9F27">ICT</div>
-        <div class="dt-spill" data-subj="Other" onclick="dtSelectSubj(this,'Other')" style="--sc:#5DCAA5">Other</div>
-      </div>
-      <div class="dt-input-row">
-        <input class="dt-input" id="dt-new-task" placeholder="Add a task for today..." maxlength="120" onkeydown="if(event.key==='Enter')dtAddTask()">
-        <button class="dt-add-btn" onclick="dtAddTask()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add
-        </button>
-      </div>
+      <button class="dt-add-btn" onclick="dtOpenModal()" style="flex:1;justify-content:center;padding:9px 14px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add task
+      </button>
     </div>
     <div class="dt-list" id="dt-list">
       <div class="dt-empty"><span class="dt-empty-icon">📋</span>No tasks yet — add one above!</div>
@@ -1976,9 +1981,18 @@ window.dtSelectSubj=function(el,subj){
   _dtSelSubj=subj;
   document.querySelectorAll('.dt-spill').forEach(function(p){p.classList.remove('active');});
   if(el)el.classList.add('active');
-  // Update input placeholder
   var inp=document.getElementById('dt-new-task');
-  if(inp)inp.placeholder=subj?'Add a '+subj+' task...':'Add a task for today...';
+  if(inp){
+    if(subj)inp.placeholder='Add a '+subj+' task...';else inp.placeholder='Add a task...';
+    inp.focus();
+    inp.style.borderColor='';
+  }
+  // Update modal border color
+  var modal=document.getElementById('dt-modal-card');
+  if(modal){
+    var colorMap={Biology:'#1D9E75',Chemistry:'#378ADD',Physics:'#7F77DD','Combined Maths':'#D85A30',ICT:'#EF9F27',Other:'#5DCAA5'};
+    modal.style.setProperty('--_dt-modal-color',colorMap[subj]||'#1D9E75');
+  }
 };
 
 function dtDateKey(offset){
@@ -2005,7 +2019,7 @@ window.setDtView=function(v,el){
   document.querySelectorAll('.dt-view-tab').forEach(function(t){t.classList.remove('active');});
   if(el)el.classList.add('active');
   var addRow=document.getElementById('dt-add-row');
-  if(addRow)addRow.style.display=(v==='today')?'flex':'none';
+  if(addRow)addRow.style.display=(v==='today'||v==='yesterday')?'flex':'none';
   renderDailyTasks();
 };
 
@@ -2094,15 +2108,38 @@ window.dtAddTask=function(){
   var inp=document.getElementById('dt-new-task');
   var text=inp?inp.value.trim():'';
   if(!text)return;
-  var dk=dtDateKey(0);
+  var dk=_dtView==='yesterday'?dtDateKey(-1):dtDateKey(0);
   var saved=localStorage.getItem('pub_chat_name')||localStorage.getItem('pub_name')||localStorage.getItem('st_username')||'';
   var nameEl=document.getElementById('c-name');
   var name=(nameEl&&nameEl.value.trim())||saved||'Anonymous';
   var payload={text:text,done:false,ts:Date.now(),createdBy:name};
   if(_dtSelSubj)payload.subject=_dtSelSubj;
   _dtRef.child(dk).push(payload);
-  if(inp)inp.value='';
+  if(inp){
+    inp.value='';
+    inp.focus();
+  }
 };
+
+window.dtOpenModal=function(){
+  document.getElementById('dt-modal').classList.add('open');
+  setTimeout(function(){
+    var inp=document.getElementById('dt-new-task');
+    if(inp){inp.value='';inp.focus();}
+  },100);
+};
+
+window.dtCloseModal=function(){
+  document.getElementById('dt-modal').classList.remove('open');
+};
+
+// Enter key in modal input
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('dt-modal').classList.contains('open')){
+    var inp=document.getElementById('dt-new-task');
+    if(inp&&document.activeElement===inp){e.preventDefault();dtAddTask();}
+  }
+});
 
 window.dtToggle=function(dk,tid){
   var task=(_dtData[dk]&&_dtData[dk][tid]);
@@ -2666,5 +2703,32 @@ window.addEventListener('beforeunload', function(){
   requestAnimationFrame(frame);
 })();
 </script>
+
+<!-- ══ ADD TASK MODAL ══ -->
+<div class="dt-modal-overlay" id="dt-modal" onclick="if(event.target===this)dtCloseModal()">
+  <div class="dt-modal" id="dt-modal-card" style="--_dt-modal-color:#1D9E75">
+    <div class="dt-modal-header">
+      <span class="dt-modal-title">Add task</span>
+      <button class="dt-modal-close" onclick="dtCloseModal()">✕</button>
+    </div>
+    <div class="dt-modal-subject-pills">
+      <div class="dt-spill active" data-subj="" onclick="dtSelectSubj(this,'')">All</div>
+      <div class="dt-spill" data-subj="Biology" onclick="dtSelectSubj(this,'Biology')" style="--sc:#1D9E75">Bio</div>
+      <div class="dt-spill" data-subj="Chemistry" onclick="dtSelectSubj(this,'Chemistry')" style="--sc:#378ADD">Chem</div>
+      <div class="dt-spill" data-subj="Physics" onclick="dtSelectSubj(this,'Physics')" style="--sc:#7F77DD">Phy</div>
+      <div class="dt-spill" data-subj="Combined Maths" onclick="dtSelectSubj(this,'Combined Maths')" style="--sc:#D85A30">Maths</div>
+      <div class="dt-spill" data-subj="ICT" onclick="dtSelectSubj(this,'ICT')" style="--sc:#EF9F27">ICT</div>
+      <div class="dt-spill" data-subj="Other" onclick="dtSelectSubj(this,'Other')" style="--sc:#5DCAA5">Other</div>
+    </div>
+    <div class="dt-modal-input-row">
+      <input class="dt-input" id="dt-new-task" placeholder="Type a task..." maxlength="120" autofocus>
+      <button class="dt-add-btn" onclick="dtAddTask()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add
+      </button>
+    </div>
+    <div class="dt-modal-hint">Add multiple tasks — type and click Add each time</div>
+  </div>
+</div>
 </body>
 </html>
