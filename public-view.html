@@ -397,6 +397,36 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
 .dt-slide-task .dt-slide-task-text.done{text-decoration:line-through}
 .dt-slide-task-subj{font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;border:1px solid;flex-shrink:0}
 .dt-slide-empty{padding:2rem 0;text-align:center;font-size:12px;color:rgba(255,255,255,.2)}
+/* ══ PANIC BUTTON + 5-SEC RULE ══ */
+.panic-fab{position:fixed;bottom:90px;right:14px;z-index:8990;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#e24b4a,#b71c1c);border:2px solid rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(226,75,74,.35),0 0 0 0 rgba(226,75,74,.4);animation:panicPulse 2s ease-in-out infinite;transition:transform .12s;font-size:0}
+.panic-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(226,75,74,.5)}
+.panic-fab svg{width:22px;height:22px}
+@keyframes panicPulse{0%,100%{box-shadow:0 4px 20px rgba(226,75,74,.35),0 0 0 0 rgba(226,75,74,.3)}50%{box-shadow:0 4px 24px rgba(226,75,74,.5),0 0 0 8px rgba(226,75,74,.1)}}
+.panic-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px)}
+.panic-overlay.open{display:flex}
+.panic-card{text-align:center;max-width:320px;padding:20px}
+.panic-countdown{font-family:'Syne',sans-serif;font-size:96px;font-weight:800;color:#e24b4a;text-shadow:0 0 40px rgba(226,75,74,.5),0 0 80px rgba(226,75,74,.2);line-height:1;animation:countPop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes countPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.panic-label{font-size:13px;color:rgba(255,255,255,.4);margin-top:12px;letter-spacing:.06em}
+.panic-action{display:none;flex-direction:column;align-items:center;gap:12px;animation:fadeIn .4s ease}
+.panic-action.show{display:flex}
+.panic-action-icon{font-size:48px;animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.panic-action-text{font-size:20px;font-weight:700;color:#f0eae0;line-height:1.4;padding:0 10px}
+.panic-done-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:12px;padding:12px 32px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;transition:transform .12s}
+.panic-done-btn:hover{transform:scale(1.05)}
+.panic-skip-btn{background:none;border:none;color:rgba(255,255,255,.2);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline}
+.panic-skip-btn:hover{color:rgba(255,255,255,.4)}
+/* ══ STREAK ══ */
+.streak-mini{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem 1rem;margin-bottom:1rem;justify-content:space-between}
+.streak-mini-left{display:flex;align-items:center;gap:6px}
+.streak-mini-fire{font-size:18px}
+.streak-mini-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#e24b4a}
+.streak-mini-label{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em}
+.streak-mini-btn{background:linear-gradient(135deg,#0a3d1e,#1D9E75);border:none;border-radius:8px;padding:7px 14px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:transform .12s}
+.streak-mini-btn:hover{transform:scale(1.05)}
+.streak-mini-btn:disabled{opacity:.4;cursor:default;transform:none}
+.streak-mini-reset{background:none;border:none;color:rgba(255,255,255,.15);font-size:14px;cursor:pointer;padding:4px;line-height:1}
 @keyframes edgeFlash{0%{background:linear-gradient(180deg,#7a5a10,#c9a84c)}40%{background:linear-gradient(180deg,#dbb85c,#f0d080);box-shadow:-4px 0 30px rgba(240,192,64,.7)}100%{background:linear-gradient(180deg,#7a5a10,#c9a84c)}}
 #edge-chat-tab.flash{animation:edgeFlash .7s ease;}
 #edge-chat-panel{position:fixed;right:-320px;top:0;bottom:0;width:300px;z-index:9000;background:linear-gradient(180deg,#0f0b04,#080603);border-left:1px solid rgba(180,140,50,.2);box-shadow:-8px 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column;transition:right .3s cubic-bezier(.16,1,.3,1);}
@@ -660,6 +690,26 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
   <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   <div id="edge-chat-badge"></div><div id="edge-chat-tab-label">Chat</div>
 </div>
+
+<!-- ══ PANIC BUTTON ══ -->
+<div class="panic-fab" id="panic-fab" onclick="startPanic()" title="Emergency — break the urge">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.2" fill="currentColor"/></svg>
+</div>
+
+<!-- ══ PANIC OVERLAY ══ -->
+<div class="panic-overlay" id="panic-overlay" onclick="if(event.target===this)closePanic()">
+  <div class="panic-card" id="panic-card">
+    <div class="panic-countdown" id="panic-countdown">5</div>
+    <div class="panic-label" id="panic-label">Stop. Breathe. Count with me.</div>
+    <div class="panic-action" id="panic-action">
+      <div class="panic-action-icon">💪</div>
+      <div class="panic-action-text" id="panic-action-text">Do 15 push-ups now!</div>
+      <button class="panic-done-btn" onclick="closePanic()">✓ I did it!</button>
+      <button class="panic-skip-btn" onclick="closePanic()">Skip</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ TASKS SLIDE PANEL ══ -->
 <div class="dt-slide-overlay" id="dt-slide-overlay" onclick="if(event.target===this)dtCloseSlide()"></div>
 <div class="dt-slide-panel" id="dt-slide-panel">
@@ -843,6 +893,21 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     </div>
     <div class="dt-list" id="dt-list">
       <div class="dt-empty"><span class="dt-empty-icon">📋</span>No tasks yet — add one above!</div>
+    </div>
+  </div>
+
+  <!-- DISCIPLINE STREAK -->
+  <div class="streak-mini">
+    <div class="streak-mini-left">
+      <span class="streak-mini-fire">🔥</span>
+      <div>
+        <div class="streak-mini-num" id="pub-streak-num">0</div>
+        <div class="streak-mini-label">day streak</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="streak-mini-btn" id="pub-streak-btn" onclick="markStreakSuccess()">✅ Mark success</button>
+      <button class="streak-mini-reset" onclick="resetStreak()" title="Reset streak">↺</button>
     </div>
   </div>
 
@@ -2226,6 +2291,84 @@ function renderDtSlide(){
   });
   body.innerHTML=html;
 }
+
+// ══ PANIC BUTTON + 5-SEC RULE ══
+var _panicActions=['Do 15 push-ups now!','Get up and drink a glass of water!','Walk around the room for 1 minute!','Splash cold water on your face!','Do 10 squats!','Step outside and take 10 deep breaths!','Run in place for 30 seconds!','Stretch your body for 2 minutes!','Write down why you want to quit this habit.'];
+window.startPanic=function(){
+  document.getElementById('panic-overlay').classList.add('open');
+  var cd=document.getElementById('panic-countdown');
+  var label=document.getElementById('panic-label');
+  var action=document.getElementById('panic-action');
+  action.classList.remove('show');
+  cd.style.display='block';
+  label.style.display='block';
+  var i=5;
+  cd.textContent=i;
+  label.textContent='Stop. Breathe. Count with me.';
+  var iv=setInterval(function(){
+    i--;
+    if(i>0){
+      cd.textContent=i;
+      cd.style.animation='none';void cd.offsetWidth;cd.style.animation='countPop .5s cubic-bezier(.34,1.56,.64,1)';
+    }else{
+      clearInterval(iv);
+      cd.style.display='none';
+      label.style.display='none';
+      action.classList.add('show');
+      document.getElementById('panic-action-text').textContent=_panicActions[Math.floor(Math.random()*_panicActions.length)];
+    }
+  },1000);
+};
+window.closePanic=function(){
+  document.getElementById('panic-overlay').classList.remove('open');
+  document.getElementById('panic-action').classList.remove('show');
+};
+// ══ STREAK SYSTEM ══
+function loadStreak(){
+  var streak=parseInt(localStorage.getItem('st_panic_streak')||'0');
+  var last=localStorage.getItem('st_panic_last_date')||'';
+  var today=new Date().toDateString();
+  if(last&&last!==today){
+    var lastD=new Date(last);
+    var yest=new Date();
+    yest.setDate(yest.getDate()-1);
+    if(lastD<yest.setHours(0,0,0,0)){
+      streak=0;
+      localStorage.setItem('st_panic_streak','0');
+    }
+  }
+  updateStreakUI(streak);
+}
+function updateStreakUI(s){
+  var el=document.getElementById('pub-streak-num');
+  if(el)el.textContent=s;
+  var btn=document.getElementById('pub-streak-btn');
+  if(btn){
+    var last=localStorage.getItem('st_panic_last_date')||'';
+    var today=new Date().toDateString();
+    btn.disabled=(last===today);
+    btn.textContent=(last===today)?'✅ Done':'✅ Mark success';
+  }
+}
+window.markStreakSuccess=function(){
+  var today=new Date().toDateString();
+  var last=localStorage.getItem('st_panic_last_date')||'';
+  if(last===today){updateStreakUI(parseInt(localStorage.getItem('st_panic_streak')||'0'));return;}
+  var streak=parseInt(localStorage.getItem('st_panic_streak')||'0');
+  var yest=new Date();yest.setDate(yest.getDate()-1);
+  if(last===yest.toDateString())streak++;else streak=1;
+  localStorage.setItem('st_panic_streak',String(streak));
+  localStorage.setItem('st_panic_last_date',today);
+  updateStreakUI(streak);
+};
+window.resetStreak=function(){
+  if(confirm('Reset your discipline streak to 0?')){
+    localStorage.setItem('st_panic_streak','0');
+    localStorage.setItem('st_panic_last_date','');
+    updateStreakUI(0);
+  }
+};
+loadStreak();
 
 window.dtToggle=function(dk,tid){
   var task=(_dtData[dk]&&_dtData[dk][tid]);
