@@ -476,6 +476,18 @@ html::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;z-index:9
 @keyframes msgBounce{0%{transform:scale(0) rotate(-15deg)}100%{transform:scale(1) rotate(0)}}
 .msg-alert-name{font-size:22px;font-weight:700;color:#f0d080;margin-bottom:6px;font-family:'Cinzel',serif}
 .msg-alert-text{font-size:16px;color:rgba(255,255,255,.75);line-height:1.5;word-break:break-word;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:14px 18px;margin-top:6px}
+/* ══ TASK NOTIFICATION BANNER ══ */
+.task-notif{position:fixed;top:0;left:0;right:0;z-index:99997;display:flex;align-items:stretch;background:rgba(15,11,4,.95);border-bottom:1px solid rgba(201,168,76,.15);padding:0;gap:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:taskNotifIn .35s cubic-bezier(.16,1,.3,1);box-shadow:0 4px 30px rgba(0,0,0,.5);overflow:hidden}
+@keyframes taskNotifIn{0%{transform:translateY(-100%)}100%{transform:translateY(0)}}
+.task-notif-out{animation:taskNotifOut .3s ease forwards}
+@keyframes taskNotifOut{0%{transform:translateY(0)}100%{transform:translateY(-100%)}}
+.task-notif-border{width:4px;flex-shrink:0;background:#c9a84c}
+.task-notif-body{flex:1;padding:10px 12px;min-width:0}
+.task-notif-user{font-size:11px;font-weight:700;color:#f0d080;margin-bottom:2px}
+.task-notif-user .task-notif-label{font-weight:400;color:rgba(255,255,255,.35)}
+.task-notif-text{font-size:12px;color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-notif-close{background:none;border:none;color:rgba(255,255,255,.2);font-size:14px;cursor:pointer;padding:0 12px;line-height:1;transition:color .15s}
+.task-notif-close:hover{color:rgba(255,255,255,.5)}
 
 #splash-screen{position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 42%,#0d1a10 0%,#030806 75%);transition:opacity 1s ease,transform 1s ease;}
 #splash-screen.sp-out{opacity:0;transform:scale(1.05);pointer-events:none}
@@ -609,6 +621,21 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .pomo-settings{display:flex;gap:14px;font-size:10px;color:rgba(255,255,255,.25);align-items:center}
 .pomo-input{width:36px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;color:#f0d080;text-align:center;font-size:10px;padding:3px 2px;font-family:inherit;outline:none}
 .pomo-input:focus{border-color:rgba(201,168,76,.3)}
+
+/* ── EXAM COUNTDOWN ── */
+.exam-section{margin-bottom:1rem}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px}
+.exam-card{border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);transition:border-color .3s,background .3s}
+.exam-card.highlight{border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.04)}
+.exam-card.ongoing{border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.06)}
+.exam-card.done{opacity:.35}
+.exam-subj{font-size:11px;font-weight:700;margin-bottom:1px}
+.exam-paper{font-size:9.5px;color:rgba(255,255,255,.35);margin-bottom:3px}
+.exam-date{font-size:9px;color:rgba(255,255,255,.22);margin-bottom:5px}
+.exam-countdown{font-size:15px;font-weight:700;font-family:'Courier New',monospace;color:#f0d080}
+.exam-countdown.done{color:rgba(29,158,117,.5)}
+.exam-countdown.urgent{color:#ff6b6b}
+.exam-dur{font-size:9px;color:rgba(255,255,255,.18);margin-top:2px}
 
 /* SUBJECT BREAKDOWN */
 .section-title{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
@@ -778,6 +805,15 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
     <div class="msg-alert-text" id="msg-alert-text"></div>
   </div>
 </div>
+<!-- ══ TASK NOTIFICATION BANNER ══ -->
+<div id="task-notif" class="task-notif" style="display:none">
+  <div class="task-notif-border" id="task-notif-border"></div>
+  <div class="task-notif-body">
+    <div class="task-notif-user" id="task-notif-user"></div>
+    <div class="task-notif-text" id="task-notif-text"></div>
+  </div>
+  <button class="task-notif-close" onclick="closeTaskNotif()">&#x2715;</button>
+</div>
 <div id="edge-chat-panel">
   <div id="ecp-header">
     <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:#f0d080;stroke-width:2;stroke-linecap:round;flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -862,6 +898,12 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
       <label>Focus: <input type="number" id="pomo-focus-min" value="25" min="5" max="120" class="pomo-input"> min</label>
       <label>Break: <input type="number" id="pomo-break-min" value="5" min="1" max="30" class="pomo-input"> min &nbsp;<span style="color:rgba(255,255,255,.15);font-size:10px">auto-cycle</span></label>
     </div>
+  </div>
+
+  <!-- EXAM COUNTDOWN -->
+  <div class="exam-section">
+    <div class="section-title">&#x1F4CB; 2026 A/L Exam Countdown</div>
+    <div class="exam-grid" id="exam-grid"></div>
   </div>
 
   <!-- UPCOMING SCHEDULE ALERT (15min warning) -->
@@ -2159,6 +2201,22 @@ var _dtView='today';
 var _dtRef=db.ref('dailyTasks');
 var _dtData={};  // dateKey → { taskId: {text, done, ts, subject} }
 var _dtSelSubj=''; // currently selected subject for new tasks
+var _dtNotifKeys={},_dtNotifReady=false;
+
+window.closeTaskNotif=function(){var el=document.getElementById('task-notif');if(el){el.classList.add('task-notif-out');setTimeout(function(){el.style.display='none';el.classList.remove('task-notif-out');},300);}};
+function showTaskNotif(user,text,subj){
+  var el=document.getElementById('task-notif');if(!el)return;
+  function _e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  document.getElementById('task-notif-user').innerHTML='<span class="task-notif-label">&#x1F4CB; New task — </span>'+_e(user);
+  document.getElementById('task-notif-text').textContent=text;
+  var border=document.getElementById('task-notif-border');
+  var cMap={Biology:'#1D9E75',Chemistry:'#378ADD',Physics:'#7F77DD','Combined Maths':'#D85A30',ICT:'#EF9F27',Other:'#5DCAA5'};
+  if(border)border.style.background=cMap[subj]||'#c9a84c';
+  el.style.display='flex';
+  el.classList.remove('task-notif-out');
+  if(window._taskNotifTimer)clearTimeout(window._taskNotifTimer);
+  window._taskNotifTimer=setTimeout(window.closeTaskNotif,15000);
+}
 
 window.dtSelectSubj=function(el,subj){
   _dtSelSubj=subj;
@@ -2193,7 +2251,14 @@ function dtFriendlyDate(key){
 
 // Real-time listener
 _dtRef.on('value',function(snap){
-  _dtData=snap.val()||{};
+  var data=snap.val()||{};
+  if(_dtNotifReady){
+    Object.entries(data).forEach(function(p){var dk=p[0],dayTasks=p[1];Object.entries(dayTasks).forEach(function(p2){var tk=p2[0],task=p2[1];if(!_dtNotifKeys[tk]&&task.createdBy){_dtNotifKeys[tk]=true;var myName=localStorage.getItem('pub_chat_name')||localStorage.getItem('st_username')||'';if(task.createdBy!==myName)showTaskNotif(task.createdBy,task.text||task.title||'',task.subj||'');}});});
+  }else{
+    Object.entries(data).forEach(function(p){var dk=p[0],dayTasks=p[1];Object.entries(dayTasks).forEach(function(p2){var tk=p2[0];_dtNotifKeys[tk]=true;});});
+    _dtNotifReady=true;
+  }
+  _dtData=data;
   renderDailyTasks();
 });
 
@@ -2591,6 +2656,38 @@ loadStreak();
   window.pomoReset=function(){clearInterval(_pi);_pi=null;_ps='idle';document.getElementById('pomo-start').disabled=false;pUI();};
   window.pomoPause=function(){clearInterval(_pi);_pi=null;};
   window.pomoResume=function(){if(_ps==='idle')return;if(_pi)return;_pi=setInterval(pTick,1000);};
+})();
+
+// ══ EXAM COUNTDOWN ══
+(function(){
+  var _EXAM_DATA=[
+    {subj:'Combined Maths',paper:'Paper I',date:'2026-08-10T08:30:00',dur:'3h 10m',color:'#c9a84c'},
+    {subj:'Combined Maths',paper:'Paper II',date:'2026-08-12T08:30:00',dur:'3h 10m',color:'#c9a84c'},
+    {subj:'Biology',paper:'Paper I',date:'2026-08-10T13:00:00',dur:'2h 00m',color:'#1D9E75'},
+    {subj:'Biology',paper:'Paper II',date:'2026-08-11T13:00:00',dur:'3h 10m',color:'#1D9E75'},
+    {subj:'Physics',paper:'Paper I',date:'2026-08-14T08:30:00',dur:'2h 00m',color:'#4D96FF'},
+    {subj:'Physics',paper:'Paper II',date:'2026-08-17T08:30:00',dur:'3h 10m',color:'#4D96FF'},
+    {subj:'Chemistry',paper:'Paper I',date:'2026-08-19T08:30:00',dur:'2h 00m',color:'#FF6B6B'},
+    {subj:'Chemistry',paper:'Paper II',date:'2026-08-21T08:30:00',dur:'3h 10m',color:'#FF6B6B'}
+  ];
+  function _fmtDate(s){var d=new Date(s);return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+', '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getDate();}
+  function _pDur(s){var p=s.match(/(\d+)h\s*(\d+)m/);return p?parseInt(p[1])*3600+parseInt(p[2])*60:0;}
+  function _renderExams(){
+    var g=document.getElementById('exam-grid');if(!g)return;
+    var n=Date.now(),html='';
+    _EXAM_DATA.forEach(function(e){
+      var t=new Date(e.date).getTime(),et=t+_pDur(e.dur)*1000,d=t-n,cls='exam-card';
+      if(n>et){cls+=' done';}else if(n>=t){cls+=' ongoing';}else if(d<86400000){cls+=' highlight';}
+      var cd;
+      if(n>et)cd='✅ Done';
+      else if(n>=t)cd='🔴 Ongoing';
+      else{var d1=Math.floor(d/86400000),h=Math.floor((d%86400000)/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);cd=d1+'d '+h+'h '+m+'m '+s+'s';}
+      html+='<div class="'+cls+'"><div class="exam-subj" style="color:'+e.color+'">'+e.subj+'</div><div class="exam-paper">'+e.paper+'</div><div class="exam-date">'+_fmtDate(e.date)+'</div><div class="exam-countdown'+(n>et?' done':(n>=t?' urgent':''))+'">'+cd+'</div><div class="exam-dur">'+e.dur+'</div></div>';
+    });
+    g.innerHTML=html;
+  }
+  _renderExams();
+  setInterval(_renderExams,1000);
 })();
 
 window.dtToggle=function(dk,tid){
