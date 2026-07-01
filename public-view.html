@@ -590,6 +590,26 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
 .goal-done{background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.25);color:#5DCAA5}
 .goal-pend{background:rgba(239,159,39,.1);border:1px solid rgba(239,159,39,.2);color:var(--amber)}
 
+/* ── POMODORO FOCUS TIMER ── */
+.pomo-card{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12);border-radius:14px;padding:16px;margin-bottom:1rem}
+.pomo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pomo-title{font-size:14px;font-weight:600;color:#f0d080;font-family:'Cinzel',serif}
+.pomo-count{font-size:22px;font-weight:700;color:#c9a84c;background:rgba(201,168,76,.1);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif}
+.pomo-progress{height:4px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.pomo-bar{height:100%;width:0%;background:linear-gradient(90deg,#c9a84c,#f0d080);border-radius:3px;transition:width 1s linear}
+.pomo-phase{font-size:10px;color:rgba(255,255,255,.35);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.pomo-time{font-size:40px;font-weight:700;color:#f0d080;font-family:'Courier New',monospace;margin-bottom:6px;letter-spacing:-1px;line-height:1}
+.pomo-btn-row{display:flex;gap:8px;margin-bottom:10px}
+.pomo-btn{flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .2s}
+.pomo-btn:active{transform:scale(.97)}
+.pomo-btn:disabled{opacity:.4;cursor:default;transform:none}
+.pomo-start{background:linear-gradient(135deg,#7a5a10,#c9a84c);color:#fff}
+.pomo-reset{background:rgba(255,255,255,.04);color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.06)}
+.pomo-reset:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.pomo-settings{display:flex;gap:14px;font-size:10px;color:rgba(255,255,255,.25);align-items:center}
+.pomo-input{width:36px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;color:#f0d080;text-align:center;font-size:10px;padding:3px 2px;font-family:inherit;outline:none}
+.pomo-input:focus{border-color:rgba(201,168,76,.3)}
+
 /* SUBJECT BREAKDOWN */
 .section-title{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
 .subjects-list{display:flex;flex-direction:column;gap:7px;margin-bottom:1rem}
@@ -822,6 +842,25 @@ html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif
       <div class="cd-blk"><div class="cd-v" id="cd-mn">—</div><div class="cd-u">min</div></div>
       <span class="cd-sep">·</span>
       <div class="cd-blk"><div class="cd-v" id="cd-sc">—</div><div class="cd-u">sec</div></div>
+    </div>
+  </div>
+
+  <!-- POMODORO FOCUS TIMER -->
+  <div class="pomo-card" id="pomo-card">
+    <div class="pomo-header">
+      <span class="pomo-title">&#x1F345; Focus Timer</span>
+      <span class="pomo-count" id="pomo-count">0</span>
+    </div>
+    <div class="pomo-progress"><div class="pomo-bar" id="pomo-bar"></div></div>
+    <div class="pomo-phase" id="pomo-phase">Ready</div>
+    <div class="pomo-time" id="pomo-time">25:00</div>
+    <div class="pomo-btn-row">
+      <button class="pomo-btn pomo-start" id="pomo-start" onclick="pomoStart()">&#x25B6; Start Focus</button>
+      <button class="pomo-btn pomo-reset" id="pomo-reset" onclick="pomoReset()" style="display:none">&#x21BA; Reset</button>
+    </div>
+    <div class="pomo-settings">
+      <label>Focus: <input type="number" id="pomo-focus-min" value="25" min="5" max="120" class="pomo-input"> min</label>
+      <label>Break: <input type="number" id="pomo-break-min" value="5" min="1" max="30" class="pomo-input"> min &nbsp;<span style="color:rgba(255,255,255,.15);font-size:10px">auto-cycle</span></label>
     </div>
   </div>
 
@@ -2338,7 +2377,7 @@ function renderDtSlide(){
 }
 
 // ══ PANIC BUTTON + 5-SEC RULE + YOUTUBE MOTIVATION ══
-var _panicTeachers = ['Dinesh Muthugala', 'Darshana Ukuwela', 'Amila Dassanayake', 'Anuradha Perera', 'Lasantha Malimage', 'Saman Priyankara', 'Kapila Seneviratne', 'Sujith Nishantha'];
+var _panicTeachers = ['Darshana Ukuwela', 'Amila Dassanayake', 'Dinesh Muthugala', 'Anuradha Perera'];
 var _ytApiKey = localStorage.getItem('st_yt_api_key') || 'AIzaSyDp_KwLACfK6cbsggzl0KJOYJ8yCqLjqIA';
 var _ytCache = JSON.parse(localStorage.getItem('st_yt_cache') || '[]');
 var _ytWatched = JSON.parse(localStorage.getItem('st_yt_watched') || '[]');
@@ -2535,6 +2574,24 @@ window.resetStreak=function(){
   }
 };
 loadStreak();
+
+// ══ POMODORO FOCUS TIMER ══
+(function(){
+  var _ps='idle',_pt=0,_pTotal=0,_pCount=parseInt(localStorage.getItem('st_pomo_count')||'0'),_pDate=localStorage.getItem('st_pomo_date')||'',_pi=null;
+  var today=new Date().toDateString();
+  if(_pDate!==today){_pDate=today;_pCount=0;localStorage.setItem('st_pomo_count','0');localStorage.setItem('st_pomo_date',today);}
+  var cEl=document.getElementById('pomo-count');if(cEl)cEl.textContent=_pCount;
+  var fMin=parseInt((document.getElementById('pomo-focus-min')||{}).value)||25;
+  _pt=fMin*60;_pTotal=_pt;
+  var tEl=document.getElementById('pomo-time');if(tEl){var m=Math.floor(_pt/60),s=_pt%60;tEl.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+  function pomoSound(){try{var c=new(window.AudioContext||window.webkitAudioContext)();[523.25,659.25,783.99].forEach(function(f,i){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(f,c.currentTime+i*.15);g.gain.setValueAtTime(0,c.currentTime+i*.15);g.gain.linearRampToValueAtTime(.25,c.currentTime+i*.15+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.15+.4);o.start(c.currentTime+i*.15);o.stop(c.currentTime+i*.15+.5);});}catch(e){}}
+  function pUI(){var tEl=document.getElementById('pomo-time'),cEl=document.getElementById('pomo-count'),bEl=document.getElementById('pomo-bar'),sEl=document.getElementById('pomo-start'),rEl=document.getElementById('pomo-reset');if(cEl)cEl.textContent=_pCount;var m=Math.floor(_pt/60),s=_pt%60;if(tEl)tEl.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;var pct=_pTotal>0?((_pTotal-_pt)/_pTotal*100):0;if(bEl)bEl.style.width=pct+'%';if(_ps==='idle'){if(sEl){sEl.textContent='▶ Start Focus';sEl.disabled=false;}if(rEl)rEl.style.display='none';var fm=parseInt((document.getElementById('pomo-focus-min')||{}).value)||25;_pt=fm*60;_pTotal=_pt;var m2=Math.floor(_pt/60),s2=_pt%60;if(tEl)tEl.textContent=(m2<10?'0':'')+m2+':'+(s2<10?'0':'')+s2;var bEl2=document.getElementById('pomo-bar');if(bEl2)bEl2.style.width='0%';var phEl=document.getElementById('pomo-phase');if(phEl)phEl.textContent='Ready';}else if(_ps==='focus'){if(phEl)phEl.textContent='🎯 Focus';if(sEl){sEl.textContent='⏳ Running...';sEl.disabled=true;}if(rEl)rEl.style.display='';}else if(_ps==='break'){if(phEl)phEl.textContent='☕ Break';if(sEl){sEl.textContent='⏳ Break...';sEl.disabled=true;}if(rEl)rEl.style.display='';}}
+  function pTick(){_pt--;if(_pt<=0){clearInterval(_pi);_pi=null;pomoSound();if(_ps==='focus'){_pCount++;localStorage.setItem('st_pomo_count',''+_pCount);var bm=parseInt((document.getElementById('pomo-break-min')||{}).value)||5;_ps='break';_pt=bm*60;_pTotal=_pt;var phEl=document.getElementById('pomo-phase');if(phEl)phEl.textContent='☕ Break time!';_pi=setInterval(pTick,1000);pUI();}else if(_ps==='break'){_ps='idle';var phEl=document.getElementById('pomo-phase');if(phEl)phEl.textContent='Ready for next!';pUI();}return;}var bEl=document.getElementById('pomo-bar');var pct=_pTotal>0?((_pTotal-_pt)/_pTotal*100):0;if(bEl)bEl.style.width=pct+'%';var m=Math.floor(_pt/60),s=_pt%60;var tEl=document.getElementById('pomo-time');if(tEl)tEl.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+  window.pomoStart=function(){if(_ps!=='idle')return;var fm=parseInt((document.getElementById('pomo-focus-min')||{}).value)||25;_ps='focus';_pt=fm*60;_pTotal=_pt;var phEl=document.getElementById('pomo-phase');if(phEl)phEl.textContent='🎯 Focus';pUI();_pi=setInterval(pTick,1000);};
+  window.pomoReset=function(){clearInterval(_pi);_pi=null;_ps='idle';document.getElementById('pomo-start').disabled=false;pUI();};
+  window.pomoPause=function(){clearInterval(_pi);_pi=null;};
+  window.pomoResume=function(){if(_ps==='idle')return;if(_pi)return;_pi=setInterval(pTick,1000);};
+})();
 
 window.dtToggle=function(dk,tid){
   var task=(_dtData[dk]&&_dtData[dk][tid]);
